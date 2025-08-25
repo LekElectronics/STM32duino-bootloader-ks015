@@ -1,3 +1,14 @@
+# STM32duino-bootloader for KS015
+
+FOR KS015 - 
+make generic-pa3
+
+This will make the bin file and store it as bootloader_only_binaries/generic_boot20_pa3.bin
+
+The only artifact available for download is the generic_boot20_pa3.bin
+
+The generic-pa3 profile was made, which changes the LED pin to be PA3
+
 # STM32duino-bootloader
 
 Please Note: This code does not work with all STM32F103 Boards
