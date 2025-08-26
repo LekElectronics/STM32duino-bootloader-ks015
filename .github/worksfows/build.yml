@@ -1,0 +1,51 @@
+name: Build Firmware
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-firmware:
+    runs-on: ubuntu-latest
+    container: debian:bookworm-slim
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y build-essential wget zip make
+
+      - name: Cache ARM GCC toolchain
+        id: cache-toolchain
+        uses: actions/cache@v4
+        with:
+          path: xpack-arm-none-eabi-gcc-13.2.1-1.1
+          key: xpack-arm-gcc-13.2.1-1.1
+
+      - name: Download ARM GCC toolchain (if not cached)
+        if: steps.cache-toolchain.outputs.cache-hit != 'true'
+        run: |
+          wget https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-linux-x64.tar.gz
+          tar -xf xpack-arm-none-eabi-gcc-13.2.1-1.1-linux-x64.tar.gz
+
+      - name: Verify toolchain
+        run: |
+          export PATH="$(pwd)/xpack-arm-none-eabi-gcc-13.2.1-1.1/bin:$PATH"
+          which arm-none-eabi-gcc
+          arm-none-eabi-gcc --version
+
+      - name: Build firmware
+        run: |
+          export PATH="$(pwd)/xpack-arm-none-eabi-gcc-13.2.1-1.1/bin:$PATH"
+          make generic-pa3
+          cp bootloader_only_binaries/generic_boot20_pa3.bin generic_boot20_pa3.bin
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: generic_boot20_pa3
+          path: generic_boot20_pa3.bin
