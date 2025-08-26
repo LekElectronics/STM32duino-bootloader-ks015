@@ -31,6 +31,9 @@
  */
 #include "common.h"
 #include "hardware.h"
+
+extern int wTransferSize;
+
 /*
 void setPin(u32 bank, u8 pin) {
     u32 pinMask = 0x1 << (pin);
